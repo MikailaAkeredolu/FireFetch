@@ -16,7 +16,7 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 20) {
             
-            Text("You are now signed in")
+            Text("Home Screen")
             
             Button{
                 mainViewModel.signOut()

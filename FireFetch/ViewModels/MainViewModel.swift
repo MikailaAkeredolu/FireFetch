@@ -33,6 +33,7 @@ class MainViewModel: ObservableObject {
     
     init(){
         checkAuthenticationStatus()
+        fetchCurrentUserEmail()
     }
     
 //To determine if not to show a user AuthView if already logged in
@@ -177,6 +178,14 @@ class MainViewModel: ObservableObject {
     }
     
     
+    //Fetch Currently Authenticated User to dsiplay a welcome greeting inside ProfileView
+    //Call the function from inside the init()
+    //From Firebase Authentication
+    func fetchCurrentUserEmail() {
+           if let user = Auth.auth().currentUser {
+               self.email = user.email ?? "Unknown Email"
+           }
+    }
     
     
     
