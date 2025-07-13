@@ -20,29 +20,24 @@ struct UserProfileView: View {
                     Text("Welome, \(mainViewModel.email)")
                     .padding()
                     
+                    Image(systemName: "person.fill")
+                        .font(.largeTitle)
+                    
                     Text("You are now signed in")
-                    
-                    Button{
-                        mainViewModel.signOut()
-                    } label: {
-                        Text("Sign Out")
-                            .padding()
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .fontWeight(.bold)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.black.opacity(0.8))
-                            .cornerRadius(10)
-                           
-                    } .padding(20)
-                    
+                        .padding()
+
                     NavigationLink{
                         ContentView(mainViewModel: mainViewModel)
                     } label: {
-                            Image(systemName: "gear.circle")
-                    }
-                
-                  
+                        
+                            Text("Get Started")
+                        
+                            Image(systemName: "house.fill")
+                          
+                        
+                    }.font(.largeTitle)
+                     .foregroundStyle(.black)
+                    
                 }
         }.onAppear {
             mainViewModel.fetchCurrentUserEmail()
