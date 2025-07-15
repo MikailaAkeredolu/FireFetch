@@ -211,7 +211,8 @@ class MainViewModel: ObservableObject , Sendable {
           return try await db.collection("users").document(uid).getDocument(as: DatabaseUser.self)
       }
       
-      //public function to fetch databse user with private asyn version above it
+    
+    //public function to fetch databse user with private asyn version above it
       
       func fetchUserData(){
           
