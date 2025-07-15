@@ -17,8 +17,28 @@ struct UserProfileView: View {
                     
                 VStack{
                     
+                    Image("hglogotrans")
+                        .resizable()
+                        .scaledToFit()
+                        .containerRelativeFrame(.horizontal){ size, axis in
+                            size * 0.6
+                        }
+                        .clipShape(.capsule)
+                   
+            
                     Text("Welome, \(mainViewModel.email)")
                     .padding()
+                    
+                    //display user's uid
+                    Text(mainViewModel.authUserData?.uid ?? "null")
+                    
+                    //display user's username
+                    Text("@" + (mainViewModel.databaseUser?.username ??  "No user logged in") )
+                                   .font(.largeTitle)
+                    
+                    //display user's username
+//                    Text("@" + (mainViewModel.databaseUser?.userID ??  "No id found") )
+//                                   .font(.largeTitle)
                     
                     Image(systemName: "person.fill")
                         .font(.largeTitle)
@@ -37,10 +57,12 @@ struct UserProfileView: View {
                         
                     }.font(.largeTitle)
                      .foregroundStyle(.black)
+                     .padding(.bottom, 150)
                     
                 }
         }.onAppear {
             mainViewModel.fetchCurrentUserEmail()
+            mainViewModel.fetchUserData()
         }
         
     }

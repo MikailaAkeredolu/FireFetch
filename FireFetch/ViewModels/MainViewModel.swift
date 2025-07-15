@@ -9,13 +9,15 @@ import Foundation
 import SwiftUI
 import Firebase
 import FirebaseAuth
+import FirebaseFirestore
+import FirebaseStorage
 
-
+//Think of MainModel like a ScoreKeeper class/object that will let you know when score changes
 @MainActor
-class MainViewModel: ObservableObject {
+class MainViewModel: ObservableObject , Sendable {
     
     //Toast Variables
-    @Published var showToast: Bool = false
+    @Published var showToast: Bool = false //will update any view watching it
     @Published var toastMessage: String = ""
     
     //Auth Variables
@@ -27,6 +29,7 @@ class MainViewModel: ObservableObject {
     
     @Published var authUserData: UserData? = nil // Userdata Model
     @Published var isAuthenticated: Bool = false
+    @Published var databaseUser: DatabaseUser? = nil //from custom DatabaseUser Model
     
     
 //AUth Methods
@@ -105,7 +108,7 @@ class MainViewModel: ObservableObject {
             
         self.toastMessage = message
         self.showToast = true
-
+            //async - setting a timer
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                     self.showToast = false
             }
@@ -118,7 +121,7 @@ class MainViewModel: ObservableObject {
 //Sign In Functionality
     
     func signIn()  {
-        
+        // Abouncer at the door
         guard !email.isEmpty, !password.isEmpty else {
             print("Email or password are empty")
             return
@@ -161,6 +164,19 @@ class MainViewModel: ObservableObject {
                 
                 let result =  try await Auth.auth().createUser(withEmail: email, password: password)
                 
+                //create a new user with the result from their email and password
+                let userData = UserData(user: result.user)
+                               
+                //populate a new user's data as a document object in firestore collection
+                let db = Firestore.firestore()
+                                   
+                // create a database user with our Model
+                let databaseUser = DatabaseUser(userID: userData.uid, username: username, email: userData.email, dateCreated: Date())
+                             
+                //store it in FirebaseFirestore as a document
+                try db.collection("users").document(userData.uid).setData(from: databaseUser, merge: false)
+                                   
+                
                 DispatchQueue.main.async {
                     self.authUserData = UserData(user: result.user)
                     self.isAuthenticated = true
@@ -186,6 +202,37 @@ class MainViewModel: ObservableObject {
                self.email = user.email ?? "Unknown Email"
            }
     }
+    
+    
+    
+    //Fetch User form Firestore Database with their uid and return a db user with an async fucntion
+      private func fetchDatabaseUser(withUID uid: String) async throws -> DatabaseUser {
+          let db = Firestore.firestore()
+          return try await db.collection("users").document(uid).getDocument(as: DatabaseUser.self)
+      }
+      
+      //public function to fetch databse user with private asyn version above it
+      
+      func fetchUserData(){
+          
+          //get the uid
+          guard let uid = Auth.auth().currentUser?.uid else {
+              return
+          }
+          
+          Task {
+              do {
+                  let databaseUser = try await fetchDatabaseUser(withUID: uid)
+                  //open a dispatch que
+                  DispatchQueue.main.async {
+                      self.databaseUser = databaseUser //assign the db user found  by id to global state
+                      print("Fetched user data successfully: \(databaseUser)")
+                  }
+              } catch {
+                  print("Error occured while fetching user data from db: \(error.localizedDescription)")
+              }
+          }
+      }
     
     
     

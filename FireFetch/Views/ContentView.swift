@@ -61,7 +61,7 @@ struct Fact: Codable {
 
 struct ContentView: View {
     
-@ObservedObject var mainViewModel : MainViewModel
+@ObservedObject var mainViewModel : MainViewModel //wacthing score keeper
 @State private var fact: String = "Get a random fact!"
 @State private var isLoading = false
     
@@ -259,6 +259,6 @@ struct ProfileView: View {
 
 
 #Preview {
-    ContentView(mainViewModel: MainViewModel())
+    ContentView(mainViewModel: MainViewModel()) // provide a scorekeeper for view to observe
 }
 
