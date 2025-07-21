@@ -31,13 +31,20 @@ struct FireFetchApp: App {
     
     @State private var rootViewID = UUID() //create unique identiefier and inject itto nav stack
     
+    @State private var appData = ApplicationData.shared
+    
+    
     var body: some Scene {
  
         WindowGroup {
      
             NavigationStack {
                 currentView()
-            }.id(rootViewID) //resets the view heirarchy
+                    
+                
+            }
+            .environment(appData)
+            .id(rootViewID) //resets the view heirarchy
                 .onReceive(viewModel.$isAuthenticated) { isAuthenticated in
                     if !isAuthenticated {
                         print("user is signed out and now resetting view heirarchy")

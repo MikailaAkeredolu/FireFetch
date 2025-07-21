@@ -12,234 +12,196 @@ import FirebaseAuth
 import FirebaseFirestore
 import FirebaseStorage
 
-//Think of MainModel like a ScoreKeeper class/object that will let you know when score changes
 @MainActor
 class MainViewModel: ObservableObject , Sendable {
     
-    //Toast Variables
-    @Published var showToast: Bool = false //will update any view watching it
-    @Published var toastMessage: String = ""
-    
-    //Auth Variables
-    @Published var email = ""
-    @Published var username: String = ""
-    @Published var password: String = ""
-    @Published var isPasswordVisible: Bool = false
-    @Published var showSignInView: Bool = false
-    
-    @Published var authUserData: UserData? = nil // Userdata Model
-    @Published var isAuthenticated: Bool = false
-    @Published var databaseUser: DatabaseUser? = nil //from custom DatabaseUser Model
-    
-    
-//AUth Methods
-    
-    init(){
-        checkAuthenticationStatus()
-        fetchCurrentUserEmail()
-    }
-    
-//To determine if not to show a user AuthView if already logged in
-// DispatchQueue refers to the mainthread, where UI updates happen
-    
-    private func checkAuthenticationStatus() {
+@Published var showToast: Bool = false
+@Published var toastMessage: String = ""
+@Published var email = ""
+@Published var username: String = ""
+@Published var password: String = ""
+@Published var isPasswordVisible: Bool = false
+@Published var showSignInView: Bool = false
+@Published var authUserData: UserData? = nil
+@Published var isAuthenticated: Bool = false
+@Published var databaseUser: DatabaseUser? = nil
 
-        DispatchQueue.main.async {
-//unwrap user with Auth FirebaseAuth to get the currentUser
-            if let user = Auth.auth().currentUser {
-                
-                self.isAuthenticated = true
-                self.authUserData = UserData(user: user)
-                
-            }else{
-                
-                self.isAuthenticated = false
-                self.authUserData = nil
-                
-            }
+init(){
+    checkAuthenticationStatus()
+    fetchCurrentUserEmail()
+}
+
+private func checkAuthenticationStatus() {
+
+    DispatchQueue.main.async {
+        
+        if let user = Auth.auth().currentUser {
+            
+            self.isAuthenticated = true
+            self.authUserData = UserData(user: user)
+            
+        }else{
+            
+            self.isAuthenticated = false
+            self.authUserData = nil
             
         }
         
     }
     
+}
+
+
+func signOut() {
+
+    do {
+
+        try Auth.auth().signOut()
+        
+        DispatchQueue.main.async {
+            self.isAuthenticated = false
+            self.authUserData = nil
+        }
+        
+    } catch {
+        print("Error signing out: \(error)")
+    }
     
+}
+
+
+
+//Handle Auth Error
+
+private func handleAutherror(_ error: Error) {
+    if let error = error as? NSError,
+       let errorMessage = error.userInfo[NSLocalizedDescriptionKey] as? String {
+            showToastMessage(errorMessage)
+    }else{
+            showToastMessage("An unknown error occured")
+    }
+}
+
+
+private func showToastMessage(_ message: String) {
     
-//Sign Out Functionality
+DispatchQueue.main.async {
+        
+    self.toastMessage = message
+    self.showToast = true
+        //async - setting a timer
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                self.showToast = false
+        }
+        
+    }
+}
+
+
+func signIn()  {
     
-    func signOut() {
+    guard !email.isEmpty, !password.isEmpty else {
+        print("Email or password are empty")
+        return
+    }
     
+    Task{
         do {
-            //signout of firebase
-            try Auth.auth().signOut()
             
-            //set user to false and nil
+            let result =  try await Auth.auth().signIn(withEmail: email, password: password)
+            
             DispatchQueue.main.async {
-                self.isAuthenticated = false
-                self.authUserData = nil
+                self.authUserData = UserData(user: result.user)
+                self.isAuthenticated = true
             }
+            
+            print("Signed in successfully")
             
         } catch {
-            print("Error signing out: \(error)")
-        }
-        
-    }
-    
-
-    
-//Handle Auth Error
-    
-    private func handleAutherror(_ error: Error) {
-        if let error = error as? NSError,
-           let errorMessage = error.userInfo[NSLocalizedDescriptionKey] as? String {
-                showToastMessage(errorMessage)
-        }else{
-                showToastMessage("An unknown error occured")
-        }
-    }
-  
-    
-    
-//ShowToast Function
-//Turn toast message off by running a timer to dismiss itself 8secs
-
-    private func showToastMessage(_ message: String) {
-        
-    DispatchQueue.main.async {
-            
-        self.toastMessage = message
-        self.showToast = true
-            //async - setting a timer
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                    self.showToast = false
+            DispatchQueue.main.async {
+                self.handleAutherror(error)
             }
-            
         }
+        
     }
     
+}
 
+func signUp() {
     
-//Sign In Functionality
-    
-    func signIn()  {
-        // Abouncer at the door
-        guard !email.isEmpty, !password.isEmpty else {
-            print("Email or password are empty")
-            return
-        }
-        
-        //async await functionality
-        Task{
-            do {
-                
-                let result =  try await Auth.auth().signIn(withEmail: email, password: password)
-                
-                //Grab user property from result
-                DispatchQueue.main.async {
-                    self.authUserData = UserData(user: result.user)
-                    self.isAuthenticated = true
-                }
-                
-                print("Signed in successfully")
-                
-            } catch {
-                DispatchQueue.main.async {
-                    self.handleAutherror(error)
-                }
-            }
-            
-        }
-        
+    guard !email.isEmpty, !password.isEmpty else {
+        print("Email or password are empty")
+        return
     }
     
-    //SignUp Functionaility
-    func signUp() {
-        
-        guard !email.isEmpty, !password.isEmpty else {
-            print("Email or password are empty")
-            return
-        }
-        
-        Task{
-            do {
-                
-                let result =  try await Auth.auth().createUser(withEmail: email, password: password)
-                
-                //create a new user with the result from their email and password
-                let userData = UserData(user: result.user)
+    Task{
+        do {
+            
+            let result =  try await Auth.auth().createUser(withEmail: email, password: password)
+            
+            let userData = UserData(user: result.user)
+                           
+            let db = Firestore.firestore()
                                
-                //populate a new user's data as a document object in firestore collection
-                let db = Firestore.firestore()
-                                   
-                // create a database user with our Model
-                let databaseUser = DatabaseUser(userID: userData.uid, username: username, email: userData.email, dateCreated: Date())
-                             
-                //store it in FirebaseFirestore as a document
-                try db.collection("users").document(userData.uid).setData(from: databaseUser, merge: false)
-                                   
-                
-                DispatchQueue.main.async {
-                    self.authUserData = UserData(user: result.user)
-                    self.isAuthenticated = true
-                }
-                
-                print("Created user successfully")
-                
-            } catch {
-                DispatchQueue.main.async {
-                    self.handleAutherror(error)
-                }
+            let databaseUser = DatabaseUser(userID: userData.uid, username: username, email: userData.email, dateCreated: Date())
+                         
+            try db.collection("users").document(userData.uid).setData(from: databaseUser, merge: false)
+                               
+            
+            DispatchQueue.main.async {
+                self.authUserData = UserData(user: result.user)
+                self.isAuthenticated = true
+            }
+            
+            print("Created user successfully")
+            
+        } catch {
+            DispatchQueue.main.async {
+                self.handleAutherror(error)
             }
         }
-        
     }
     
+}
+
     
-    //Fetch Currently Authenticated User to dsiplay a welcome greeting inside ProfileView
-    //Call the function from inside the init()
-    //From Firebase Authentication
-    func fetchCurrentUserEmail() {
-           if let user = Auth.auth().currentUser {
-               self.email = user.email ?? "Unknown Email"
-           }
-    }
+func fetchCurrentUserEmail() {
+       if let user = Auth.auth().currentUser {
+           self.email = user.email ?? "Unknown Email"
+       }
+}
+
     
-    
-    
-    //Fetch User form Firestore Database with their uid and return a db user with an async fucntion
-      private func fetchDatabaseUser(withUID uid: String) async throws -> DatabaseUser {
-          let db = Firestore.firestore()
-          return try await db.collection("users").document(uid).getDocument(as: DatabaseUser.self)
-      }
+private func fetchDatabaseUser(withUID uid: String) async throws -> DatabaseUser {
+  let db = Firestore.firestore()
+  return try await db.collection("users").document(uid).getDocument(as: DatabaseUser.self)
+}
       
     
-    //public function to fetch databse user with private asyn version above it
-      
-      func fetchUserData(){
-          
-          //get the uid
-          guard let uid = Auth.auth().currentUser?.uid else {
-              return
+
+func fetchUserData(){
+  
+  //get the uid
+  guard let uid = Auth.auth().currentUser?.uid else {
+      return
+  }
+  
+  Task {
+      do {
+          let databaseUser = try await fetchDatabaseUser(withUID: uid)
+          //open a dispatch que
+          DispatchQueue.main.async {
+              self.databaseUser = databaseUser //assign the db user found  by id to global state
+              print("Fetched user data successfully: \(databaseUser)")
           }
-          
-          Task {
-              do {
-                  let databaseUser = try await fetchDatabaseUser(withUID: uid)
-                  //open a dispatch que
-                  DispatchQueue.main.async {
-                      self.databaseUser = databaseUser //assign the db user found  by id to global state
-                      print("Fetched user data successfully: \(databaseUser)")
-                  }
-              } catch {
-                  print("Error occured while fetching user data from db: \(error.localizedDescription)")
-              }
-          }
+      } catch {
+          print("Error occured while fetching user data from db: \(error.localizedDescription)")
       }
+  }
+}
     
-    
-    
-    
-    
-} //end of class
+
+}
 
 
 extension MainViewModel {

@@ -1,6 +1,6 @@
 //
 //  AuthView.swift
-//  FireFetch
+//  FireFetchyvbnm,./
 //
 //  Created by mikaila Akeredolu on 7/13/25.
 //
@@ -28,21 +28,16 @@ struct AuthView: View {
                 Spacer()
                     .frame(height: 100)
                 
-                //email reusable view
                 emailTextField
                 
-                //show username field when not in sign in view
                 if mainViewModel.showSignInView == false {
                     usernameTextField
                 }
                 
-                //password
                 passwordTextField
-                
-                //Action Button
+            
                 actionButton
-                
-                //toggle Button
+            
                 toggleButton
             
             }
@@ -57,7 +52,7 @@ struct AuthView: View {
                         .easeIn(duration: 0.8),
                       value: mainViewModel.showToast
                     )
-            } // showTaost if statement
+            }
             
             
         } //end of zsack
@@ -66,7 +61,6 @@ struct AuthView: View {
     
     //Reusabele Views go here
     
-    //Email
     private var emailTextField: some View {
         HStack{
             TextField("Email", text: $mainViewModel.email)
@@ -77,9 +71,9 @@ struct AuthView: View {
                 .autocapitalization(.none)
                 .disableAutocorrection(true)
         }.background()
-    } // end of reusable email view
+    }
     
-    //Password
+
     private var passwordTextField: some View {
             
             HStack{
@@ -150,7 +144,6 @@ struct AuthView: View {
                 .frame(maxWidth: .infinity)
                 .background(
                     mainViewModel.isValidEmail() ? Color.green : Color.gray
-                   // Color.green
                 )
                 .cornerRadius(10)
 
