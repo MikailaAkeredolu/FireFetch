@@ -1,7 +1,7 @@
 //  ContentView.swift
 //  TabViewDemos
 //  Created by mikaila Akeredolu on 7/8/25.
-//
+// This is our main view that holds our tabs and Tab View
 
 import SwiftUI
 import Observation
@@ -10,7 +10,7 @@ struct ContentView: View {
     
 @Environment(ApplicationData.self) private var appData
     
-@ObservedObject var mainViewModel : MainViewModel //wacthing score keeper
+@ObservedObject var mainViewModel : MainViewModel
 @State private var fact: String = "Get a random fact!"
 @State private var isLoading = false
     

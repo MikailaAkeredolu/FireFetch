@@ -1,6 +1,6 @@
 //
 //  AuthView.swift
-//  FireFetchyvbnm,./
+//   This is the sign in, sign up and sign out view
 //
 //  Created by mikaila Akeredolu on 7/13/25.
 //
@@ -177,11 +177,7 @@ struct AuthView: View {
         }
     }
     
-    
-    
-    
-    
-    
+
 } // end of AuthView{}
 
 

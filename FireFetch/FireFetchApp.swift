@@ -1,7 +1,6 @@
 //
 //  FireFetchApp.swift
-//  FireFetch
-//
+// This is where a lot of our configurations are for our app
 //  Created by mikaila Akeredolu on 7/6/25.
 //
 
@@ -15,10 +14,10 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     FirebaseApp.configure()
       print("checking if firebase configured successfully")
     return true
-  } // end of fuction
+  }
     
     
-} //end of class
+}
 
 @main
 struct FireFetchApp: App {
@@ -44,21 +43,20 @@ struct FireFetchApp: App {
                 
             }
             .environment(appData)
-            .id(rootViewID) //resets the view heirarchy
+            .id(rootViewID)
                 .onReceive(viewModel.$isAuthenticated) { isAuthenticated in
                     if !isAuthenticated {
                         print("user is signed out and now resetting view heirarchy")
                         rootViewID = UUID() //forces the nav stack to reset itself with new id
                     }
                   
-                } //end of onReceived
-        } //end of WindowGroup
+                }
+        }
         
-    } //end of body
+    }
     
     
-    //Use a view builder modifier
-    //dismiss when gear is clicked to logout user
+
     @ViewBuilder
     private func currentView() -> some View {
         if viewModel.isAuthenticated {
@@ -69,4 +67,4 @@ struct FireFetchApp: App {
     }
     
     
-} //end of struct
+}

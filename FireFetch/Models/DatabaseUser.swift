@@ -1,6 +1,6 @@
 //
 //  DatabaseUser.swift
-//  FireFetch
+// This is the database model for our user accounts
 //
 //  Created by mikaila Akeredolu on 7/14/25.
 //

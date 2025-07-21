@@ -1,6 +1,7 @@
 //
 //  ApplicationData.swift
-//  JsonFile
+
+//  If not fetching data from an api then this is how you can create your own JsonFile / API data locally
 //
 //  Created by mikaila Akeredolu on 7/20/25.
 //
@@ -15,8 +16,8 @@ import Observation
     var userData: [Car] = []
     static let shared: ApplicationData = ApplicationData()
     
-    //Initialize your own data as if you are fetching from an API
-    private init(){
+   
+    private init(){  //Initialize your own data as if you are fetching from an API
         
         //Make as many Car objects you like within this array
         userData = [

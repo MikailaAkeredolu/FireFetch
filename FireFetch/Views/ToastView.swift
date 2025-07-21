@@ -1,7 +1,7 @@
 //
 //  ToastView.swift
 //  FireFetch
-//
+//This is uded for notifications with our AuthView
 //  Created by mikaila Akeredolu on 7/13/25.
 //
 

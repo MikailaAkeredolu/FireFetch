@@ -3,7 +3,7 @@
 //  FireFetch
 //
 //  Created by mikaila Akeredolu on 7/13/25.
-//
+// This ibviiosly our user profile view;s code
 
 import SwiftUI
 
@@ -29,16 +29,10 @@ struct UserProfileView: View {
                     Text("Welome, \(mainViewModel.email)")
                     .padding()
                     
-                    //display user's uid
-                    Text(mainViewModel.authUserData?.uid ?? "null")
-                    
                     //display user's username
                     Text("@" + (mainViewModel.databaseUser?.username ??  "No user logged in") )
                                    .font(.largeTitle)
-                    
-                    //display user's username
-//                    Text("@" + (mainViewModel.databaseUser?.userID ??  "No id found") )
-//                                   .font(.largeTitle)
+                
                     
                     Image(systemName: "person.fill")
                         .font(.largeTitle)

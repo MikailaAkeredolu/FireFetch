@@ -3,7 +3,7 @@
 //  FireFetch
 //
 //  Created by mikaila Akeredolu on 7/6/25.
-//
+// All the functionalities to use Firtebabse for Authentication and as a databse are here
 
 import Foundation
 import SwiftUI
