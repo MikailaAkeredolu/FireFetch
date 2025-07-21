@@ -29,6 +29,11 @@
 			path = FireFetch;
 			sourceTree = "<group>";
 		};
+		CC84A6552E2F00D1004B618A /* Sounds */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Sounds;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,6 +60,7 @@
 		CC45378E2E1ACF9A0099F9CB = {
 			isa = PBXGroup;
 			children = (
+				CC84A6552E2F00D1004B618A /* Sounds */,
 				CC4537992E1ACF9A0099F9CB /* FireFetch */,
 				CC4537982E1ACF9A0099F9CB /* Products */,
 			);
@@ -85,6 +91,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				CC4537992E1ACF9A0099F9CB /* FireFetch */,
+				CC84A6552E2F00D1004B618A /* Sounds */,
 			);
 			name = FireFetch;
 			packageProductDependencies = (

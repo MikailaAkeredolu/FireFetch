@@ -49,6 +49,12 @@ struct ContentView: View {
                 Text("Contact")
             }
             
+            SoundView()
+            .tabItem {
+                    Image(systemName: "music.note")
+                    Text("Sound")
+                }
+            
         } //end of TabView
         
     } //end of content body
@@ -351,6 +357,46 @@ struct  ContactView : View {
             Text("Thank you! We'll get back to you soon.")
         }
     }
+}
+
+
+//Sound View
+
+import AVKit
+
+class SoundManager {
+ 
+    static let instance = SoundManager()
+    
+    var player: AVAudioPlayer?
+    
+    func playSound() {
+        
+        guard let url = Bundle.main.url(forResource: "diceSound", withExtension: ".mp3") else { return }
+        
+        do{
+            player = try AVAudioPlayer(contentsOf: url)
+            player?.play()
+            
+        }catch let error{
+            print("error playing sound: \(error.localizedDescription)")
+        }
+    
+    }
+    
+}
+
+struct SoundView: View {
+    var body: some View {
+        VStack{
+                Button("Play Sound") {
+                    SoundManager.instance.playSound()
+                       
+                }
+                
+             }
+            .buttonStyle(.borderedProminent)
+        }
 }
 
 
