@@ -202,14 +202,20 @@ struct FactView: View {
                         Color.yellow
         
                         VStack {
-                            Image("hglogotrans")
-                                .resizable()
-                                .scaledToFit()
-                                .containerRelativeFrame(.horizontal){ size, axis in
-                                    size * 0.6
-                                }
-                                .clipShape(.capsule)
+                            
+                            RandomImageView()
+                                .frame(width: 300, height: 300)
+                                //.clipShape(Circle())
                                 .padding()
+                            
+//                            Image("hglogotrans")
+//                                .resizable()
+//                                .scaledToFit()
+//                                .containerRelativeFrame(.horizontal){ size, axis in
+//                                    size * 0.6
+//                                }
+//                                .clipShape(.capsule)
+//                                .padding()
         
         
                             Text(fact)
@@ -397,6 +403,61 @@ struct SoundView: View {
              }
             .buttonStyle(.borderedProminent)
         }
+}
+
+
+struct RandomImageView: View {
+    
+    // Array of image names (make sure these are in your Assets)
+      let imageNames = [
+          "Hyundai_kona",
+          "Volksawagen-e-golf",
+          "model-s",
+      ]
+    
+    // State to keep track of current image
+      @State private var currentImageName: String = ""
+    
+    
+    var body: some View {
+        
+        ZStack {
+            Color.black.ignoresSafeArea()
+            
+            if let image = UIImage(named: currentImageName) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .transition(.opacity)
+                    .padding()
+                    .animation(.easeInOut(duration: 0.5), value: currentImageName)
+            } else {
+                Text("No image found")
+                    .foregroundColor(.white)
+            }
+        }
+        .onAppear {
+            pickRandomImage()
+            startImageLoop()
+        }
+        
+    }
+    
+    // Change image every few seconds
+    private func startImageLoop() {
+        Timer.scheduledTimer(withTimeInterval: 3.0, repeats: true) { _ in
+            pickRandomImage()
+        }
+    }
+    
+    // Pick a random image from the array
+    private func pickRandomImage() {
+        if let newImage = imageNames.randomElement() {
+            currentImageName = newImage
+        }
+    }
+    
+    
 }
 
 
